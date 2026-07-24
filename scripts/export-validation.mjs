@@ -24,6 +24,10 @@ try {
   await mkdir(new URL("_next/", dist), { recursive: true });
   await cp(new URL("apps/web/.next/static/", root), new URL("_next/static/", dist), { recursive: true });
   await cp(new URL("apps/web/public/", root), dist, { recursive: true });
+  await mkdir(new URL("server/", dist), { recursive: true });
+  await writeFile(new URL("server/index.js", dist), "export default { fetch(request, env) { return env.ASSETS.fetch(request); } };");
+  await mkdir(new URL(".openai/", dist), { recursive: true });
+  await cp(new URL(".openai/hosting.json", root), new URL(".openai/hosting.json", dist));
 } finally {
   server.kill("SIGTERM");
 }

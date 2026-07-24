@@ -1,0 +1,30 @@
+services:
+  mysql:
+    image: mariadb:11.4.5
+    restart: unless-stopped
+    environment:
+      MARIADB_DATABASE: ${MYSQL_DATABASE:-easyappointments}
+      MARIADB_USER: ${MYSQL_USER:-easyappointments}
+      MARIADB_PASSWORD: ${MYSQL_PASSWORD:?configure MYSQL_PASSWORD}
+      MARIADB_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?configure MYSQL_ROOT_PASSWORD}
+    volumes: [easyappointments-db:/var/lib/mysql]
+    healthcheck: {test: ["CMD","healthcheck.sh","--connect","--innodb_initialized"], interval: 10s, timeout: 5s, retries: 10}
+  easyappointments:
+    image: alextselegidis/easyappointments:1.6.0
+    restart: unless-stopped
+    depends_on: {mysql: {condition: service_healthy}}
+    environment:
+      BASE_URL: http://localhost:8080
+      DEBUG_MODE: "FALSE"
+      DB_HOST: mysql
+      DB_NAME: ${MYSQL_DATABASE:-easyappointments}
+      DB_USERNAME: ${MYSQL_USER:-easyappointments}
+      DB_PASSWORD: ${MYSQL_PASSWORD:?configure MYSQL_PASSWORD}
+    ports: ["8080:80"]
+  web:
+    build: {context: ., dockerfile: apps/web/Dockerfile}
+    restart: unless-stopped
+    depends_on: [easyappointments]
+    env_file: [.env]
+    ports: ["3000:3000"]
+volumes: {easyappointments-db: {}}

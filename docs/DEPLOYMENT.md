@@ -1,0 +1,2 @@
+# Deploy
+Use TLS, segredos fora da imagem, proxy reverso, banco privado, volumes persistentes e backups diários testados. Execute `docker compose config`, testes e build. Restrinja `/admin` do Easy!Appointments, configure SMTP, cron/worker, API key, webhook e políticas. Não use `latest`. Restauração: pare escritas, restaure dump e volume compatíveis, valide migrações e faça teste de fumaça. Nenhum deploy foi realizado.

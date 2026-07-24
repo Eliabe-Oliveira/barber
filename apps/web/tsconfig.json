@@ -22,6 +22,12 @@
     "paths": {
       "@/*": [
         "./src/*"
+      ],
+      "@agenda/config": [
+        "../../packages/config/src/index.ts"
+      ],
+      "@agenda/scheduling": [
+        "../../packages/scheduling/src/index.ts"
       ]
     },
     "allowJs": true,
@@ -33,7 +39,8 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    ".next/dev/types/**/*.ts"
+    ".next/dev/types/**/*.ts",
+    "../../packages/**/*.ts"
   ],
   "exclude": [
     "node_modules"

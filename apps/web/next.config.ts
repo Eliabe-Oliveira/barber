@@ -1,6 +1,5 @@
 import type { NextConfig } from "next";
 const config: NextConfig = {
-  transpilePackages: ["@agenda/config", "@agenda/scheduling"],
   async headers() {
     const security = [
       { key: "X-Content-Type-Options", value: "nosniff" }, { key: "X-Frame-Options", value: "DENY" },

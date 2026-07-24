@@ -12,8 +12,6 @@
     "test:e2e": "playwright test"
   },
   "dependencies": {
-    "@agenda/config": "file:../../packages/config",
-    "@agenda/scheduling": "file:../../packages/scheduling",
     "next": "^16.2.11",
     "postcss": "^8.5.23",
     "react": "19.0.0",

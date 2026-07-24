@@ -2,6 +2,12 @@
 
 Primeira versão de uma PWA mobile-first reutilizável, com preset `BARBERSHOP`. O Easy!Appointments é a fonte de verdade; o Next.js funciona como apresentação e BFF. Dados comerciais ausentes não são inventados.
 
+## Site para validação
+
+**[Abrir a versão pública da Barber](https://barber-validacao.elufurtado.chatgpt.site)**
+
+Esta publicação usa dados demonstrativos e não cria agendamentos reais. Ela serve para o cliente validar identidade, textos, informações comerciais e fluxo.
+
 ## Executar
 
 Requisitos: Node.js 20.9+ (recomendado 22), npm 10 e Docker Compose.

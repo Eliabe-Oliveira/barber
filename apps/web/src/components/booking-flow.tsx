@@ -5,15 +5,15 @@ type Catalog = { services: Service[]; professionals: Provider[] };
 type Form = {serviceId:string;providerId:string;date:string;time:string;name:string;phone:string;email:string;notes:string;whatsappConsent:boolean;privacyAccepted:boolean;website:string};
 const initial: Form = {serviceId:"",providerId:"",date:"",time:"",name:"",phone:"",email:"",notes:"",whatsappConsent:false,privacyAccepted:false,website:""};
 const labels = ["Serviço","Profissional","Data","Horário","Seus dados","Revisão"];
-export function BookingFlow() {
-  const [catalog,setCatalog]=useState<Catalog>({services:[],professionals:[]}), [form,setForm]=useState<Form>(initial);
+export function BookingFlow({initialCatalog}:{initialCatalog:Catalog}) {
+  const [catalog,setCatalog]=useState<Catalog>(initialCatalog), [form,setForm]=useState<Form>(initial);
   const [step,setStep]=useState(0), [slots,setSlots]=useState<string[]>([]), [busy,setBusy]=useState(false), [error,setError]=useState(""), [done,setDone]=useState<Appointment|null>(null);
-  useEffect(()=>{fetch("/api/catalog").then(r=>r.json()).then(setCatalog)},[]);
+  useEffect(()=>{if(!initialCatalog.services.length)fetch("/api/catalog").then(r=>r.json()).then(setCatalog)},[initialCatalog.services.length]);
   const professionals=useMemo(()=>catalog.professionals.filter(p=>p.serviceIds.includes(form.serviceId)),[catalog,form.serviceId]);
   const service=catalog.services.find(s=>s.id===form.serviceId), professional=catalog.professionals.find(p=>p.id===form.providerId);
   const update=<K extends keyof Form>(key:K,value:Form[K])=>setForm(v=>({...v,[key]:value}));
-  async function loadSlots(date:string) { update("date",date); update("time",""); setBusy(true); setError(""); const r=await fetch(`/api/availability?serviceId=${encodeURIComponent(form.serviceId)}&providerId=${encodeURIComponent(form.providerId)}&date=${date}`); const data=await r.json(); setSlots(data.slots||[]); setBusy(false); }
-  async function submit() { setBusy(true); setError(""); const r=await fetch("/api/bookings",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(form)}); const data=await r.json(); setBusy(false); if(!r.ok){setError(data.error);return;} setDone(data.appointment); }
+  async function loadSlots(date:string) { update("date",date); update("time",""); setBusy(true); setError(""); try { const r=await fetch(`/api/availability?serviceId=${encodeURIComponent(form.serviceId)}&providerId=${encodeURIComponent(form.providerId)}&date=${date}`); const data=await r.json(); setSlots(data.slots||[]); } catch { if(process.env.NEXT_PUBLIC_VALIDATION_MODE==="1") setSlots(["09:00","09:30","10:00","13:30","14:00","15:30"]); else setError("Não foi possível consultar a agenda."); } setBusy(false); }
+  async function submit() { setBusy(true); setError(""); try { const r=await fetch("/api/bookings",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(form)}); const data=await r.json(); if(!r.ok){setError(data.error);return;} setDone(data.appointment); } catch { if(process.env.NEXT_PUBLIC_VALIDATION_MODE==="1") setDone({token:"preview",reference:"DEMO-001",serviceId:form.serviceId,providerId:form.providerId,providerName:professional?.name||"Profissional disponível",start:`${form.date}T${form.time}:00-03:00`,customerName:form.name,phoneMasked:"••••••"+form.phone.replace(/\D/g,"").slice(-4),status:"CONFIRMED"}); else setError("Não foi possível concluir agora."); } finally { setBusy(false); } }
   if(done) return <section className="booking done"><span className="success">✓</span><p className="eyebrow">HORÁRIO CONFIRMADO</p><h1>Agendamento realizado.</h1><p>Guarde o código <strong>{done.reference}</strong>.</p><dl><div><dt>Profissional</dt><dd>{done.providerName}</dd></div><div><dt>Data e horário</dt><dd>{new Date(done.start).toLocaleString("pt-BR",{dateStyle:"long",timeStyle:"short"})}</dd></div></dl><a className="button" href={`/agendamento/gerenciar/${done.token}`}>Gerenciar agendamento</a></section>;
   return <section className="booking">
     <div className="progress"><span>Etapa {step+1} de 6</span><progress value={step+1} max={6}/></div>

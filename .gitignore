@@ -6,6 +6,7 @@ test-results
 .env.local
 coverage
 *.tsbuildinfo
+dist
 *.log
 .DS_Store
 infra/easyappointments/data

@@ -1,3 +1,3 @@
-import Link from "next/link"; import { businessConfig } from "@agenda/config"; import { BookingFlow } from "@/components/booking-flow";
+import Link from "next/link"; import { businessConfig } from "@agenda/config"; import { BookingFlow } from "@/components/booking-flow"; import { getSchedulingProvider } from "@/lib/provider";
 export const metadata={title:"Agendar",robots:{index:false,follow:false}};
-export default function Page(){return <main id="conteudo"><header className="nav"><Link className="brand" href="/">{businessConfig.name}</Link><Link href="/">Fechar ×</Link></header><BookingFlow/></main>}
+export default async function Page(){const provider=getSchedulingProvider();const [services,professionals]=await Promise.all([provider.listServices(),provider.listProviders()]);return <main id="conteudo"><header className="nav"><Link className="brand" href="/">{businessConfig.name}</Link><Link href="/">Fechar ×</Link></header><BookingFlow initialCatalog={{services,professionals}}/></main>}
